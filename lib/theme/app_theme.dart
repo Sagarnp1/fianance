@@ -5,91 +5,127 @@ class AppTheme {
   // Colors
   static const Color primaryColor = Color(0xFF6200EE);
   static const Color secondaryColor = Color(0xFF03DAC6);
-  static const Color errorColor = Color(0xFFB00020);
   static const Color incomeColor = Color(0xFF4CAF50);
-  static const Color expenseColor = Color(0xFFE53935);
-  static const Color savingsColor = Color(0xFF2196F3);
+  static const Color expenseColor = Color(0xFFF44336);
+  static const Color backgroundColor = Color(0xFFF5F5F5);
+  static const Color cardColor = Colors.white;
+  static const Color darkBackgroundColor = Color(0xFF121212);
+  static const Color darkCardColor = Color(0xFF1E1E1E);
+  static const Color darkTextColor = Colors.white;
+  static const Color lightTextColor = Colors.black87;
+  
+  // Text Styles
+  static final TextStyle headingStyle = GoogleFonts.poppins(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  );
+  
+  static final TextStyle subheadingStyle = GoogleFonts.poppins(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+  );
+  
+  static final TextStyle bodyStyle = GoogleFonts.poppins(
+    fontSize: 14,
+  );
   
   // Light Theme
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    brightness: Brightness.light,
     colorScheme: ColorScheme.light(
       primary: primaryColor,
       secondary: secondaryColor,
-      error: errorColor,
-      background: Colors.grey[50]!,
-      surface: Colors.white,
+      background: backgroundColor,
+      surface: cardColor,
     ),
-    textTheme: GoogleFonts.poppinsTextTheme(),
-    appBarTheme: AppBarTheme(
-      elevation: 0,
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black,
-      titleTextStyle: GoogleFonts.poppins(
-        color: Colors.black,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
+    scaffoldBackgroundColor: backgroundColor,
     cardTheme: CardTheme(
+      color: cardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    appBarTheme: AppBarTheme(
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: headingStyle.copyWith(color: Colors.white),
+    ),
+    textTheme: TextTheme(
+      displayLarge: headingStyle.copyWith(color: lightTextColor),
+      displayMedium: subheadingStyle.copyWith(color: lightTextColor),
+      bodyLarge: bodyStyle.copyWith(color: lightTextColor),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: primaryColor,
+      foregroundColor: Colors.white,
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        if (states.contains(MaterialState.selected)) {
+          return primaryColor;
+        }
+        return Colors.grey;
+      }),
+      trackColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        if (states.contains(MaterialState.selected)) {
+          return primaryColor.withOpacity(0.5);
+        }
+        return Colors.grey.withOpacity(0.5);
+      }),
     ),
   );
   
   // Dark Theme
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
+    brightness: Brightness.dark,
     colorScheme: ColorScheme.dark(
       primary: primaryColor,
       secondary: secondaryColor,
-      error: errorColor,
-      background: const Color(0xFF121212),
-      surface: const Color(0xFF1E1E1E),
+      background: darkBackgroundColor,
+      surface: darkCardColor,
     ),
-    textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
-    appBarTheme: AppBarTheme(
-      elevation: 0,
-      backgroundColor: const Color(0xFF1E1E1E),
-      titleTextStyle: GoogleFonts.poppins(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
+    scaffoldBackgroundColor: darkBackgroundColor,
     cardTheme: CardTheme(
+      color: darkCardColor,
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
     ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: darkCardColor,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: headingStyle.copyWith(color: Colors.white),
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    textTheme: TextTheme(
+      displayLarge: headingStyle.copyWith(color: darkTextColor),
+      displayMedium: subheadingStyle.copyWith(color: darkTextColor),
+      bodyLarge: bodyStyle.copyWith(color: Colors.white70),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        if (states.contains(MaterialState.selected)) {
+          return primaryColor;
+        }
+        return Colors.grey;
+      }),
+      trackColor: MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        if (states.contains(MaterialState.selected)) {
+          return primaryColor.withOpacity(0.5);
+        }
+        return Colors.grey.withOpacity(0.5);
+      }),
     ),
   );
 }

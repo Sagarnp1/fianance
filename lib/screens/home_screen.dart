@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:financetracker/providers/auth_provider.dart';
-import 'package:financetracker/providers/transaction_provider.dart';
-import 'package:financetracker/screens/add_transaction_screen.dart';
-import 'package:financetracker/screens/analytics_screen.dart';
-import 'package:financetracker/screens/budget_screen.dart';
-import 'package:financetracker/screens/settings_screen.dart';
-import 'package:financetracker/widgets/transaction_list.dart';
-import 'package:financetracker/widgets/summary_cards.dart';
+import '../providers/transaction_provider.dart';
+import '../widgets/balance_card.dart';
+import '../widgets/recent_transactions.dart';
+import '../widgets/spending_chart.dart';
+import '../widgets/income_expense_summary.dart';
+import 'add_transaction_screen.dart';
+import 'statistics_screen.dart';
+import 'budget_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -18,30 +19,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TransactionProvider>(context, listen: false).syncWithCloud();
-    });
-  }
-
+  
+  final List<Widget> _screens = [
+    const DashboardScreen(),
+    const StatisticsScreen(),
+    const BudgetScreen(),
+    const SettingsScreen(),
+  ];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Finance Tracker'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Provider.of<AuthProvider>(context, listen: false).signOut();
-            },
-          ),
-        ],
+      body: _screens[_selectedIndex],
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
-      body: _buildBody(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -56,8 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Analytics',
+            icon: Icon(Icons.bar_chart),
+            label: 'Statistics',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet),
@@ -69,55 +68,69 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: _selectedIndex == 0
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const AddTransactionScreen(),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
-    );
-  }
-
-  Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return _buildHomeTab();
-      case 1:
-        return const AnalyticsScreen();
-      case 2:
-        return const BudgetScreen();
-      case 3:
-        return const SettingsScreen();
-      default:
-        return _buildHomeTab();
-    }
-  }
-
-  Widget _buildHomeTab() {
-    return Consumer<TransactionProvider>(
-      builder: (context, provider, _) {
-        return Column(
-          children: [
-            SummaryCards(
-              income: provider.getTotalIncome(),
-              expense: provider.getTotalExpense(),
-              savings: provider.getSavings(),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TransactionList(
-                transactions: provider.transactions,
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({Key? key}) : super(key: key);
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Finance Tracker'),
+        ),
+        body: Consumer<TransactionProvider>(
+          builder: (context, provider, _) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                // Force a rebuild of the widget
+                setState(() {});
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BalanceCard(
+                      balance: provider.balance,
+                      income: provider.totalIncome,
+                      expense: provider.totalExpense,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Spending Overview',
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    const SpendingChart(),
+                    const SizedBox(height: 24),
+                    const IncomeExpenseSummary(),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Recent Transactions',
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    RecentTransactions(
+                      transactions: provider.transactions.take(5).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
